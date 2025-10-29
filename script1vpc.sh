@@ -11,6 +11,10 @@ aws ec2 modify-vpc-attribute \
     --enable-dns-hostnames "{\"Value\":true}"
 
 #Creo la subnet y devuelvo su id
-#SUBNET_ID=$(aws ec2 create-subnet --vpc-id $VPC_ID --cidr-block 192.168.0.0/28 \
-#    --availability-zone us-east-1a --query Subnet.SubnetId --output text)
-#echo $SUBNET_ID
+SUBNET_ID=$(aws ec2 create-subnet \
+    --vpc-id $VPC_ID \
+    --cidr-block 192.168.1.0/28 \
+    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=misubredXAVI1}]' \
+    --query Subnet.SubnetId --output text)
+
+echo $SUBNET_ID
