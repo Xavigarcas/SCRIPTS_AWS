@@ -14,7 +14,13 @@ aws ec2 modify-vpc-attribute \
 SUBNET_ID=$(aws ec2 create-subnet \
     --vpc-id $VPC_ID \
     --cidr-block 192.168.1.0/28 \
-    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=misubredXAVI1}]' \
+    --tag-specifications 'ResourceType=subnet,Tags=[{Key=Name,Value=misubredXAVI2}]' \
     --query Subnet.SubnetId --output text)
 
 echo $SUBNET_ID
+
+#Habilito la asignacion de la ipv4publica en la subred
+#Comprobar como no se habilita y tenemos que hacerlo a posteriori
+aws ec2 modify-subnet-attribute \
+  --subnet-id $SUBNET_ID \
+  --map-public-ip-on-launch
