@@ -24,3 +24,27 @@ echo $SUBNET_ID
 aws ec2 modify-subnet-attribute \
   --subnet-id $SUBNET_ID \
   --map-public-ip-on-launch
+
+#Creando grupo de seguridad
+$SG_ID=$(aws ec2 create-security-group --group-name SGVPC --description "Mi grupo de seguridad para abrir el puerto 22" --output text)
+
+aws ec2 authorize-security-group-ingress \
+    --group-id $SG_ID \
+    --protocol tcp \
+    --port 22 \
+    --cidr 0.0.0.0/24
+
+
+#Creando instancia ec2
+EC2_ID=$(aws ec2 run-instances \
+    --image-id ami-0360c520857e3138f \
+    --instance-type t3.micro \
+    --subnet-id $SUBNET_ID \
+    --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=miec2}]' \
+    --key-name vockey \
+    --associate-public-ip-address \
+    --security-group-ids $SG_ID \
+    --query Instances.InstanceId --output text)
+
+sleep 15
+echo $EC2_ID
