@@ -16,7 +16,7 @@ SG_ID=$(aws ec2 create-security-group \
 
 echo "Grupo de seguridad creado: $SG_ID"
 
-# Permitir tráfico HTTP (80)
+# Permitimos el HTTP 
 aws ec2 authorize-security-group-ingress \
   --group-id $SG_ID \
   --protocol tcp \
@@ -24,7 +24,7 @@ aws ec2 authorize-security-group-ingress \
   --cidr 0.0.0.0/0 \
   --region $REGION
 
-# Permitir tráfico HTTPS (443)
+# Permitimos el HTTPS
 aws ec2 authorize-security-group-ingress \
   --group-id $SG_ID \
   --protocol tcp \
@@ -32,7 +32,7 @@ aws ec2 authorize-security-group-ingress \
   --cidr 0.0.0.0/0 \
   --region $REGION
 
-# Permitir tráfico SSH (22)
+# Permitimos el SSH
 aws ec2 authorize-security-group-ingress \
   --group-id $SG_ID \
   --protocol tcp \
@@ -49,7 +49,7 @@ echo "SG_ID: $SG_ID"
 
 echo "Creando Network Load Balancer (NLB)..."
 
-# Crear el Load Balancer en una sola subnet
+# Creamos el Balanceador
 NLB_PRUEBA=$(aws elbv2 create-load-balancer \
   --name nlb-xavi \
   --type network \
@@ -61,7 +61,7 @@ NLB_PRUEBA=$(aws elbv2 create-load-balancer \
 
 echo "NLB creado: $NLB_ARN"
 
-# Crear Target Group (TCP:80)
+# Creamos el target group
 TG_PRUEBA=$(aws elbv2 create-target-group \
   --name tg-xavi \
   --protocol TCP \
@@ -74,7 +74,7 @@ TG_PRUEBA=$(aws elbv2 create-target-group \
 
 echo "Target Group creado: $TG_PRUEBA"
 
-# Registrar instancias en el Target Group
+# Registramos las instancias en el target group
 aws elbv2 register-targets \
   --target-group-arn $TG_PRUEBA \
   --targets Id=$INSTANCIA_1 Id=$INSTANCIA_2 \
@@ -82,7 +82,7 @@ aws elbv2 register-targets \
 
 echo "Instancias registradas en el Target Group."
 
-# Crear listener en el puerto 80 (TCP)
+# Creamos el listener
 aws elbv2 create-listener \
   --load-balancer-arn $NLB_PRUEBA \
   --protocol TCP \
@@ -92,7 +92,7 @@ aws elbv2 create-listener \
 
 echo "Listener creado. El balanceador ya está activo."
 
-# Mostrar DNS del NLB
+# Mostramos DNS del balanceador
 DNS_NAME=$(aws elbv2 describe-load-balancers \
   --load-balancer-arns $NLB_PRUEBA \
   --region $REGION \

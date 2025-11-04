@@ -26,12 +26,12 @@ aws ec2 modify-subnet-attribute \
   --map-public-ip-on-launch
 
 #Creando grupo de seguridad
-$SG_ID=$(aws ec2 create-security-group --group-name SGVPC --description "Mi grupo de seguridad para abrir el puerto 22" --output text)
+$SG_ID=$(aws ec2 create-security-group --group-name SGVPC --description "Mi grupo de seguridad para abrir el puerto 80" --output text)
 
 aws ec2 authorize-security-group-ingress \
     --group-id $SG_ID \
     --protocol tcp \
-    --port 22 \
+    --port 80 \
     --cidr 0.0.0.0/24
 
 
