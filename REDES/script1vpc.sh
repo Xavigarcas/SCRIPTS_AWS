@@ -50,6 +50,11 @@ EC2_ID=$(aws ec2 run-instances \
     --security-group-ids $SG_ID \
     --query Instances.InstanceId --output text)
 
+#Añadiendo el grupo de seguridad a posteriori
+#aws ec2 modify-instance-attribute \
+#    --instance-id $EC2_ID \
+#    --groups $SG_ID
+
 sleep 15
 echo $EC2_ID
 
