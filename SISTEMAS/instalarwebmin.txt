@@ -1,0 +1,10 @@
+#!/bin/bash
+
+curl -fsSL https://raw.githubusercontent.com/webmin/webmin/master/setup-repos.sh -o setup-repos.sh
+sh setup-repos.sh -f
+
+apt-get update -y
+
+apt-get install -y webmin
+
+/usr/share/webmin/changepass.pl /etc/webmin/ root 1234
