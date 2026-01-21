@@ -304,12 +304,14 @@ RT2_WEST=$(aws ec2 describe-route-tables --region $REGION_WEST --filters "Name=v
 echo "Configurando rutas para VPC1 US-EAST-1..."
 aws ec2 create-route --route-table-id $RT1_EAST --destination-cidr-block 10.2.0.0/16 --transit-gateway-id $TGW_EAST --region $REGION_EAST
 aws ec2 create-route --route-table-id $RT1_EAST --destination-cidr-block 192.168.0.0/16 --transit-gateway-id $TGW_EAST --region $REGION_EAST
+aws ec2 create-route --route-table-id $RT1_EAST --destination-cidr-block 192.224.0.0/16 --transit-gateway-id $TGW_EAST --region $REGION_EAST
 aws ec2 create-route --route-table-id $RT1_EAST --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW1_EAST --region $REGION_EAST
 
 # Routes para US-EAST-1 VPC 2
 echo "Configurando rutas para VPC2 US-EAST-1..."
 aws ec2 create-route --route-table-id $RT2_EAST --destination-cidr-block 10.1.0.0/16 --transit-gateway-id $TGW_EAST --region $REGION_EAST
 aws ec2 create-route --route-table-id $RT2_EAST --destination-cidr-block 192.168.0.0/16 --transit-gateway-id $TGW_EAST --region $REGION_EAST
+aws ec2 create-route --route-table-id $RT2_EAST --destination-cidr-block 192.224.0.0/16 --transit-gateway-id $TGW_EAST --region $REGION_EAST
 aws ec2 create-route --route-table-id $RT2_EAST --destination-cidr-block 0.0.0.0/0 --gateway-id $IGW2_EAST --region $REGION_EAST
 
 # Routes para US-WEST-2 VPC 1
@@ -336,12 +338,45 @@ aws ec2 create-transit-gateway-route \
     --transit-gateway-attachment-id $PEERING_ID \
     --region $REGION_EAST
 
+aws ec2 create-transit-gateway-route \
+    --destination-cidr-block 192.224.0.0/16 \
+    --transit-gateway-route-table-id $TGW_RT_EAST \
+    --transit-gateway-attachment-id $PEERING_ID \
+    --region $REGION_EAST
+
 # Rutas en Transit Gateway US-WEST-2
 echo "Configurando rutas en Transit Gateway US-WEST-2..."
 aws ec2 create-transit-gateway-route \
     --destination-cidr-block 10.0.0.0/8 \
     --transit-gateway-route-table-id $TGW_RT_WEST \
     --transit-gateway-attachment-id $PEERING_ID \
+    --region $REGION_WEST
+
+# Asociar y propagar peering en ambos Transit Gateways
+echo "Asociando peering connection en Transit Gateways..."
+
+# Asociar peering en US-EAST-1
+aws ec2 associate-transit-gateway-route-table \
+    --transit-gateway-attachment-id $PEERING_ID \
+    --transit-gateway-route-table-id $TGW_RT_EAST \
+    --region $REGION_EAST
+
+# Propagar rutas del peering en US-EAST-1
+aws ec2 enable-transit-gateway-route-table-propagation \
+    --transit-gateway-attachment-id $PEERING_ID \
+    --transit-gateway-route-table-id $TGW_RT_EAST \
+    --region $REGION_EAST
+
+# Asociar peering en US-WEST-2
+aws ec2 associate-transit-gateway-route-table \
+    --transit-gateway-attachment-id $PEERING_ID \
+    --transit-gateway-route-table-id $TGW_RT_WEST \
+    --region $REGION_WEST
+
+# Propagar rutas del peering en US-WEST-2
+aws ec2 enable-transit-gateway-route-table-propagation \
+    --transit-gateway-attachment-id $PEERING_ID \
+    --transit-gateway-route-table-id $TGW_RT_WEST \
     --region $REGION_WEST
 
 # ==========================================
